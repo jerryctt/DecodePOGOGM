@@ -1,4 +1,4 @@
-# DecodePOGOGM
+# Decode POGO GameMaster
 
 This utility cloud convert binary game master file of PokemonGO to readable json file. The protobuf is from `https://github.com/Furtif/POGOProtos.git`. 
 
