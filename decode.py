@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-import json, sys, re, os, struct, os.path
+import json, sys, re, os, struct, os.path, io
+import glob
 
 import binascii
 import struct
@@ -52,9 +53,9 @@ def decrypt_file(fileKey, inFile, outFile):
 def readAdFile(adFileName):    
     # Read MOVE name
     with io.open(adFileName, encoding='utf-8') as aData:
-        ad = json.load( aData )
+        ad = json.load( aData )['digest']
         adItems = []
-        for item in ad:        
+        for item in ad:                    
             bundleName = item['bundleName']
             if bundleName != 'i18n_moves' and bundleName != 'i18n_pokemon':
                 continue
@@ -62,7 +63,17 @@ def readAdFile(adFileName):
         return adItems
         
     return None
+ 
+def findFileBySize(path, size):
+    allFiles = os.listdir( path )
+    for name in allFiles:
+        fullName = path + name
+        statinfo = os.stat(fullName)
+        if statinfo.st_size == size:
+            return fullName
+    return None
     
+       
 if __name__ == '__main__':
     if len(sys.argv) != 3:
         print('decode.py [ad_json_file_name] [bundle_directory]')
@@ -70,5 +81,11 @@ if __name__ == '__main__':
     adItems = readAdFile(sys.argv[1])
     
     # Find the file
+    for name in adItems:
+        fullName = findFileBySize( sys.argv[2], name['size'] )
+        if fullName == None:
+            print 'Cannot find %s' % name['bundleName']
+            continue
+        decrypt_file( name['key'], fullName, name['bundleName']+'.txt' )
     #decrypt_file()    
         
