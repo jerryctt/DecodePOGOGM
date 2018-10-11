@@ -47,7 +47,7 @@ def decrypt_file(fileKey, inFile, outFile):
     # FIXME: sanitize bundle_name!
     with open(outFile, 'wb') as out:
         out.write(data)
-    
+    print outFile + ' Finish'
     return True   
     
 def readAdFile(adFileName):    
