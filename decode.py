@@ -20,13 +20,13 @@ def decrypt_file(fileKey, inFile, outFile):
     key = ''
     for i in range(0, 16):
         key += chr(ord(net_key[i]) ^ ord(key_mask[i]))
-        sys.stderr.write('%02x' % ord(key[-1]))
+#        sys.stderr.write('%02x' % ord(key[-1]))
 
-    sys.stderr.write('\n')
+ #   sys.stderr.write('\n')
 
-    size = os.path.getsize('d') - 37
+    size = os.path.getsize(inFile) - 37
     if size <= 0:
-        sys.stderr.write("Error: %s is too short\n" % path)
+        sys.stderr.write("Error: %s is too short\n" % inFile)
         return False
     elif (size & 0x0F) != 0:
         # AES-128 => block of 128 bits (16 bytes)
@@ -35,13 +35,25 @@ def decrypt_file(fileKey, inFile, outFile):
     with open(inFile, 'rb') as input:
         version = struct.unpack('B', input.read(1))[0]
         if version != 1:
-            sys.stderr.write("Error: invalid version number for %s (%d)\n" % (path, version))
+            sys.stderr.write("Error: invalid version number for %s (%d)\n" % (inFile, version))
             return False
 
         iv = input.read(16)
 
         cipher = AES.new(key, AES.MODE_CBC, iv)
-        data = cipher.decrypt(input.read(size))
+        raw = input.read(size)
+        
+        ## Add padding~
+        size = len(raw)
+#        print 'The size is ' + str(size)
+ #       print 'The raw size is ' + str(len(raw))
+        paddinglen = ((size+15)%16)+1
+  #      print 'The padding size is %d'%(paddinglen)
+        if paddinglen > 0 and paddinglen < 16:
+            raw = raw[:-paddinglen]
+   #         print 'The new raw size is ' + str(len(raw))
+            
+        data = cipher.decrypt(raw)
 
 
     # FIXME: sanitize bundle_name!
@@ -57,7 +69,7 @@ def readAdFile(adFileName):
         adItems = []
         for item in ad:                    
             bundleName = item['bundleName']
-            if bundleName != 'i18n_moves' and bundleName != 'i18n_pokemon':
+            if not 'i18n' in bundleName:
                 continue
             adItems.append( item )
         return adItems
@@ -84,7 +96,7 @@ if __name__ == '__main__':
     for name in adItems:
         fullName = findFileBySize( sys.argv[2], name['size'] )
         if fullName == None:
-            print 'Cannot find %s' % name['bundleName']
+            #print 'Cannot find %s' % name['bundleName']
             continue
         decrypt_file( name['key'], fullName, name['bundleName']+'.txt' )
     #decrypt_file()    
