@@ -7,7 +7,7 @@ from unitypack.asset import Asset
 from unitypack.object import ObjectPointer
 
 def main():
-    with open('patch_i18n_chinesetraditional.txt', "rb") as f:
+    with open(sys.argv[1], "rb") as f:
         bundle = unitypack.load(f)
 
         for asset in bundle.assets:
@@ -17,11 +17,17 @@ def main():
                     continue
                     
                 table = d.get('Table')
-                for item in table:
-                    for entry, v in item.items():
-                        print( entry )
-                        print( v )
+                
+       #         print( json.dumps( table, ensure_ascii=False, sort_keys=True, indent=4 ) )
+                with io.open( sys.argv[1]+'.json', 'w', encoding='utf8') as fw:
+                    fw.write( unicode(json.dumps(allitem, ensure_ascii=False, sort_keys=True, indent=4)) )
+
+#                for item in table:
+ #                   print( json.dumps( item ) )
             print('\n\n\n')
 
 if __name__ == "__main__":
-	main()
+    if len(sys.argv) != 2:
+        print('debundle.py bundle_file_name')
+        sys.exit(0)
+    main()
