@@ -5,3 +5,5 @@ cd pokemongo-game-master
 libPath=`find ./lib/*.jar -type f`
 mvn install:install-file -Dfile="$libPath"
 mvn package
+jarPath=`find ./pokemongo-game-master/target/pokemongo-*.jar -type f`
+cp "$jarPath" pokemongo-game-master.jar
