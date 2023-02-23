@@ -16,7 +16,7 @@ def main(gmfile):
         with io.open( gmfile+'.json', 'w', encoding='utf-8') as out:
             out.write( unicode(json.dumps(dict_obj, sort_keys=True, indent=4)) )
             
-    print "END"
+    print ("END")
         
 if __name__ == '__main__':
     if len(sys.argv) != 2:
